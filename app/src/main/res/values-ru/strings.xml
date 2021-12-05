@@ -10,6 +10,7 @@
     <string name="true_button">Да</string>
     <string name="false_button">Нет</string>
     <string name="next_button">Дальше</string>
+    <string name="prev_button">Назад</string>
     <string name="correct_toast">Правильно!</string>
     <string name="incorrect_toast">Неправильно!</string>
 </resources>
