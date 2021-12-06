@@ -2,10 +2,13 @@ package ru.androidbook.mygeoquiz
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+
+private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,9 +28,13 @@ class MainActivity : AppCompatActivity() {
     )
 
     private var currentIndex = 0
+    private var usedAnswer = arrayOf<Boolean>(false, false, false, false, false, false)
+    private var numberCorrectAnswers = 0
+    private var numberAnswers = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate(Bundle?) called")
         setContentView(R.layout.activity_main)
 
         trueButton = findViewById(R.id.true_button)
@@ -46,34 +53,81 @@ class MainActivity : AppCompatActivity() {
 
         questionTextView.setOnClickListener {
             currentIndex = (currentIndex + 1) % questionBank.size
-            updateQuestin()
+            updateQuestion()
         }
 
         nextButton.setOnClickListener {
             currentIndex = (currentIndex + 1) % questionBank.size
-            updateQuestin()
+            updateQuestion()
         }
 
         prevButton.setOnClickListener {
             currentIndex = (questionBank.size - 1 + currentIndex) % questionBank.size
-            updateQuestin()
+            updateQuestion()
         }
 
-        updateQuestin()
+        updateQuestion()
     }
 
-    private fun updateQuestin() {
+    override fun onStart() {
+        super.onStart()
+        Log.d(TAG, "onStart() called")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume() called")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "onPause() called")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "onStop() called")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG, "onDestroy() called")
+    }
+
+    private fun updateQuestion() {
         val questionTextResId = questionBank[currentIndex].textResId
         questionTextView.setText(questionTextResId)
+        setEnabledButton()
     }
 
     private fun checkAnswer(userAnswer: Boolean) {
         val correctAnswer = questionBank[currentIndex].answer
         val messageResId = if (userAnswer == correctAnswer) {
+            numberCorrectAnswers = ++numberCorrectAnswers
             R.string.correct_toast
         } else {
             R.string.incorrect_toast
         }
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show()
+        numberAnswers = ++numberAnswers
+        usedAnswer[currentIndex] = true
+        setEnabledButton()
+        checkGameOver()
+    }
+
+    private fun setEnabledButton() {
+        trueButton.isEnabled = !usedAnswer[currentIndex]
+        falseButton.isEnabled = !usedAnswer[currentIndex]
+    }
+
+    private fun checkGameOver() {
+        if (numberAnswers == questionBank.size) {
+            val str = String.format(
+                getString(R.string.number_correct_answer),
+                numberCorrectAnswers,
+                numberAnswers
+            )
+            questionTextView.setText(str)
+        }
     }
 }
