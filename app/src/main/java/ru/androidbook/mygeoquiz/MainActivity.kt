@@ -10,6 +10,8 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 
 private const val TAG = "MainActivity"
+private const val KEY_INDEX = "index"
+private const val KEY_USEDANSWER = "usedAnswer"
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,13 +22,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var questionTextView: TextView
 
     private val quizViewModel: QuizViewModel by lazy {
-        ViewModelProvider(this).get(QuizViewModel::class.java)
+        ViewModelProvider(this)[QuizViewModel::class.java]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate(Bundle?) called")
         setContentView(R.layout.activity_main)
+
+        val currentIndex = savedInstanceState?.getInt(KEY_INDEX, 0) ?: 0
+        quizViewModel.currentIndex = currentIndex
+
+
 
         trueButton = findViewById(R.id.true_button)
         falseButton = findViewById(R.id.false_button)
@@ -60,6 +67,13 @@ class MainActivity : AppCompatActivity() {
         updateQuestion()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(KEY_INDEX, quizViewModel.currentIndex)
+        val usAnsw = quizViewModel.usedAnswer.toBooleanArray()
+        outState.putBooleanArray(KEY_USEDANSWER, usAnsw)
+    }
+
     private fun updateQuestion() {
         val questionTextResId = quizViewModel.currentQuestionText
         questionTextView.setText(questionTextResId)
@@ -84,6 +98,8 @@ class MainActivity : AppCompatActivity() {
     private fun setEnabledButton() {
         trueButton.isEnabled = !quizViewModel.usedAnswer[quizViewModel.currentIndex]
         falseButton.isEnabled = !quizViewModel.usedAnswer[quizViewModel.currentIndex]
+//        trueButton.isEnabled = !usAnsw[quizViewModel.currentIndex]
+//        falseButton.isEnabled = !usAnsw[quizViewModel.currentIndex]
     }
 
     private fun checkGameOver() {
