@@ -8,6 +8,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 
 private const val TAG = "MainActivity"
 private const val KEY_INDEX = "index"
@@ -22,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var questionTextView: TextView
 
     private val quizViewModel: QuizViewModel by lazy {
-        ViewModelProvider(this)[QuizViewModel::class.java]
+        ViewModelProvider(this).get(QuizViewModel::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
